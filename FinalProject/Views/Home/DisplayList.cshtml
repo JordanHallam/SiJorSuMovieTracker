@@ -1,0 +1,97 @@
+﻿<html>
+<body class="viewBkgd">
+    @{
+        ViewData["Title"] = "Movie List";
+    }
+    @model List<UserMovie>
+    <div>
+        @{ var result = TempData["MovieExistsCheck"];}
+        @if (result != null)
+        {
+            <p>@TempData["MovieExistsCheck"] </p>
+            <br />
+        }
+        <h4 class="titleColor">Your current movie list</h4>
+        <table class="table table-bordered table-striped tableBorderWidth">
+            <tr>
+                <th> Title</th>
+                <th> Watched?</th>
+                <th> Watch Location</th>
+                <th> Date Watched</th>
+                <th> Your Rating</th>
+                <th> Your Review</th>
+                <th>Watched With</th>
+                <th></th>
+            </tr>
+            @foreach (UserMovie m in Model)
+            {
+                <tr>
+                    <td> <a href="../Home/MovieSelection?id=@m.MovieId" class="aRef"><b>@m.Title</b></a> </td>
+                    @if (m.Watched == true)
+                    {
+                        <td> Watched</td>
+                        <td>@m.WatchLocation </td>
+                        @if (m.WatchYear != null)
+                        {
+                            <td>@m.WatchYear.ToString().Remove(10).TrimEnd('1') </td>
+                        }
+                        else
+                        {
+                            <td> </td>
+                        }
+                    }
+                    else
+                    {
+                        <td> Not watched</td>
+                        <td> n/a</td>
+                        <td> n/a</td>
+                    }
+                    @if (m.UserRating > 0)
+                    {                        
+                        <td>
+                            <form action="../Home/UpdateUserRating" method="post">
+                                <div class="slidecontainer">
+                                    <input name="id" hidden value=@m.Id />
+                                    Rating: <span id="rating"></span>
+                                    <input type="range" min="1" max="100" value=@m.UserRating class="slider" id="userRating" name="userRating">
+                                </div>
+                                <input type="submit" class="btn-link aRef" onclick="return confirm('Are you sure, you want to update your rating?')" value="Change"/>
+                            </form>
+                        </td>
+                    }
+                    else
+                    {
+                        <td> </td>
+                    }
+                    <td>@m.UserReview </td>
+                    @if (@m.WatchedTogetherId != null)
+                    {
+                        <td>@m.WatchedTogetherId</td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                    <td width="100%" class="btn btn-light btn-outline-info"> <a href="../Home/UpdateMovie?id=@m.Id" class="aRef"><b>Update</b></a> </td>
+                    <td width="100%" class="btn btn-light btn-outline-danger" onclick="return confirm('Are you sure you want to remove this movie?')"> <a href="../Home/DeleteMovie?id=@m.Id"class="aRef"><b>Remove</b></a> </td>
+                </tr>
+            }
+        </table>
+        <a href="../Home/Search" type="button" class="btn btn-light btn-outline-info"><b>Title Search</b></a>
+    </div>
+</body>
+</html>
+<script>
+    var sliders, outputs, i;
+    sliders = document.querySelectorAll("#userRating");
+    outputs = document.querySelectorAll("#rating");
+    for (i = 0; i < sliders.length; i++) {
+        outputs[i].innerHTML = sliders[i].value;
+        (function (i) {
+            sliders[i].addEventListener('input', function () {
+                outputs[i].innerHTML = this.value;
+            });
+        })(i);
+    }
+ 
+</script>
